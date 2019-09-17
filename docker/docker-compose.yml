@@ -1,0 +1,94 @@
+version: '3.5'
+
+services:
+  postgres:
+    container_name: postgres_container_market
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PGDATA: /data/postgres
+    volumes:
+    - postgres:/data/postgres
+    ports:
+    - "5432:5432"
+    networks:
+    - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container_market
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+    - pgadmin:/root/.pgadmin
+    ports:
+    - "${PGADMIN_PORT:-5050}:80"
+    networks:
+    - postgres
+    restart: unless-stopped
+
+
+  elasticsearch:
+    container_name: elasticsearch_container_market
+    image: elasticsearch:7.3.0
+    volumes:
+      - "esdata1_market:/usr/share/elasticsearch/data"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+      - "discovery.type=single-node"
+      - "network.host=0.0.0.0"
+    networks:
+    - postgres
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.3.0
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+    - "5601:5601"
+    networks:
+    - postgres
+#  zookeeper:
+#    container_name: zookeeper_container
+#    image: wurstmeister/zookeeper:3.4.6
+#    ports:
+#      - 2181:2181
+#  kafka:
+#    container_name: kafka_container
+#    image: wurstmeister/kafka:1.0.0
+#    environment:
+#      KAFKA_ADVERTISED_HOST_NAME: localhost
+#      KAFKA_ADVERTISED_PORT: 9092
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#    ports:
+#      - 9092:9092
+#  sonarqube:
+#    container_name: sonarqube
+#    image: sonarqube
+#    ports:
+#      - "9002:9000"
+#  swaggerapi_ui:
+#    container_name: swaggerapi_ui_container
+#    image: swaggerapi/swagger-ui
+#    ports:
+#      - 8081:8080
+#  hazelcast-management-center:
+#    container_name: hazelcast-management-center-container
+#    image: hazelcast/management-center
+#    ports:
+#      - 8180:8080
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+  esdata1_market:
+    driver: local

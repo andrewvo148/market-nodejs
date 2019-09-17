@@ -1,0 +1,16 @@
+PUT /market
+{
+    "mappings": {
+        "properties":
+            "item_id": { "type": "keyword", "index": false },
+            "title": { "type": "text" },
+            "description": { "type": "text" },
+            "price": { "type": "double"},
+            "state": {"type": "keyword"},
+            "city": { "type": "text"},
+            "district": {"type": "text"},
+            "ward": {"type": "text"},
+            
+        }
+    }
+}
